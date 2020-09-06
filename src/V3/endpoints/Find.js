@@ -61,6 +61,7 @@ export default class Find extends Endpoint {
         }
 
         const sourceName = this._getExternalSource(externalId, type);
+        if (!sourceName) return Promise.reject(Error('Invalid external ID.'));
 
         try {
             const response = await this.findByExternalId(externalId, {
