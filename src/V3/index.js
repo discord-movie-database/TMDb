@@ -25,6 +25,7 @@ export default class V3 {
      * @param {string} [apiOptions.region] API region
      * @param {Object} [wrapperOptions] Wrapper options
      * @param {number} [wrapperOptions.results_per_page] Results per page
+     * @param {boolean} [wrapperOptions.custom_id] Use custom TMDb ID prefix for external ID method?
      */
     constructor(apiOptions, wrapperOptions) {
         this.version = 3;
@@ -42,6 +43,7 @@ export default class V3 {
 
         this.wrapperOptions = {
             results_per_page: null,
+            custom_id: false,
 
             ...wrapperOptions,
         };

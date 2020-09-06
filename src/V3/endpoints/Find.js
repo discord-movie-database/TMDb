@@ -19,7 +19,8 @@ export default class Find extends Endpoint {
     constructor(version, apiOptions, wrapperOptions) {
         super(version, apiOptions, wrapperOptions, paths);
 
-        this.externalSources = {
+        this._customId = /^t(\d+)$/;
+        this._externalSources = {
             movie_results: { imdb_id: /^tt\d+$/ },
             tv_results: { imdb_id: /^tt\d+$/ },
             person_results: { imdb_id: /^nm\d+$/ },
@@ -34,12 +35,12 @@ export default class Find extends Endpoint {
      * @returns {string}
      */
     _getExternalSource(externalId, type) {
-        const sources = this.externalSources[type];
+        const sources = this._externalSources[type];
         const sourceNames = Object.keys(sources);
 
         for (let i = 0; i < sourceNames.length; i += 1) {
             const sourceName = sourceNames[i];
-            const sourceValue = this.externalSources[type][sourceName];
+            const sourceValue = this._externalSources[type][sourceName];
 
             if (sourceValue.test(externalId)) return sourceName;
         }
@@ -53,6 +54,12 @@ export default class Find extends Endpoint {
      * @returns {Promise<number>}
      */
     async _getIdFromExternalSource(externalId, type) {
+        if (this._wrapperOptions.custom_id) {
+            const isCustom = externalId.match(this._customId);
+
+            if (isCustom) return isCustom[1];
+        }
+
         const sourceName = this._getExternalSource(externalId, type);
 
         try {
