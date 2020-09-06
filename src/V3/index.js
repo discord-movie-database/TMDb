@@ -69,8 +69,12 @@ export default class V3 {
     async _getIdFromMethod(method, type) {
         if (method.id) return method.id;
 
-        if (method.externalId) {
-            return this.find._getIdFromExternalSource(method.externalId, type);
+        try {
+            if (method.externalId) {
+                return await this.find._getIdFromExternalSource(method.externalId, type);
+            }
+        } catch (error) {
+            if (!method.query) return error;
         }
 
         if (method.query) {
