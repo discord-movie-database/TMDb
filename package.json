@@ -3,7 +3,7 @@
     "name": "tmdb",
     "description": "A Node.js API wrapper for The Movie Database (TMDb)",
     "version": "1.0.0",
-    "main": "src/TMDb.js",
+    "main": "src/index.js",
     "dependencies": {
         "axios": "^0.19.2",
         "esm": "^3.2.25"
