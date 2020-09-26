@@ -101,7 +101,7 @@ export default class Endpoint {
 
         const offsetCount = apiResultsPerPage / wrapperResultsPerPage;
 
-        const apiPageLimit = 1000;
+        const apiPageLimit = 500;
         const wrapperPageLimit = apiPageLimit * offsetCount;
 
         const inputPage = params.page || 1;
