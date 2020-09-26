@@ -118,7 +118,8 @@ export default class Endpoint {
         const offsetNumber = (inputPage - 1) % offsetCount;
         const offsetPosition = offsetNumber * wrapperResultsPerPage;
 
-        if (offsetPosition > response.results.length) return Promise.reject(Error('No results.'));
+        if (response.results.length === 0 || offsetPosition > response.results.length)
+            return Promise.reject(Error('No results.'));
 
         for (let i = 0; i < response.results.length; i += 1)
             response.results[i].index = (requestPage - 1) * apiResultsPerPage + i + 1;
