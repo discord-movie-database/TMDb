@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import ResponseError from './ResponseError';
+
 /**
  * Endpoint structure.
  *
@@ -54,8 +56,8 @@ export default class Endpoint {
      * @returns {Promise<Object>}
      */
     async _request(method, path, params = {}, body = {}, headers = {}) {
-        if (!method) return Promise.reject(Error('Method required.'));
-        if (!path) return Promise.reject(Error('Path required.'));
+        if (!method) return Promise.reject(new ResponseError('Method required.'));
+        if (!path) return Promise.reject(new ResponseError('Path required.'));
 
         try {
             const { data: response } = await axios({
@@ -68,11 +70,13 @@ export default class Endpoint {
 
             return response;
         } catch (error) {
-            if (error.response) return Promise.reject(error.response);
-            if (error.request)
-                return Promise.reject(Error('Request was made but no response was received.'));
+            if (error.response)
+                return Promise.reject(new ResponseError('API error.', error.response.data));
 
-            return Promise.reject(Error('Unknown error when sending request.'));
+            if (error.request)
+                return Promise.reject(new ResponseError('Request made but no response received.'));
+
+            return Promise.reject(new ResponseError('Unknown error when sending request.'));
         }
     }
 
@@ -104,7 +108,7 @@ export default class Endpoint {
         const requestPage = Math.ceil(inputPage / offsetCount);
 
         if (inputPage < 1 || inputPage > wrapperPageLimit)
-            return Promise.reject(Error(`Page must be less than or equal to ${wrapperPageLimit}`));
+            return Promise.reject(new ResponseError(`Page must be ⩽ to ${wrapperPageLimit}`));
 
         let response;
         const requestParams = { ...params, page: requestPage };
@@ -119,7 +123,7 @@ export default class Endpoint {
         const offsetPosition = offsetNumber * wrapperResultsPerPage;
 
         if (response.results.length === 0 || offsetPosition > response.results.length)
-            return Promise.reject(Error('No results.'));
+            return Promise.reject(new ResponseError('No results.'));
 
         for (let i = 0; i < response.results.length; i += 1)
             response.results[i].index = (requestPage - 1) * apiResultsPerPage + i + 1;

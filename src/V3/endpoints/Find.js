@@ -1,4 +1,5 @@
 import Endpoint from '../structures/Endpoint';
+import ResponseError from '../structures/ResponseError';
 
 import paths from '../paths/find';
 
@@ -61,7 +62,7 @@ export default class Find extends Endpoint {
         }
 
         const sourceName = this._getExternalSource(externalId, type);
-        if (!sourceName) return Promise.reject(Error('Invalid external ID.'));
+        if (!sourceName) return Promise.reject(new ResponseError('Invalid external ID.'));
 
         try {
             const response = await this.findByExternalId(externalId, {
@@ -69,7 +70,7 @@ export default class Find extends Endpoint {
             });
 
             const results = response[type];
-            if (results.length === 0) return Promise.reject(Error('No results.'));
+            if (results.length === 0) return Promise.reject(new ResponseError('No results.'));
 
             return results[0].id;
         } catch (error) {
@@ -81,6 +82,7 @@ export default class Find extends Endpoint {
      * Gets TMDb ID from external ID for all media types.
      * @see https://developers.themoviedb.org/3/find/find-by-id
      *
+     * @param {string} externalId External ID
      * @param {Object} [options] Request options
      * @param {string} [options.language] ISO 639-1 value to get translated data
      * @param {string} [options.external_source] External source

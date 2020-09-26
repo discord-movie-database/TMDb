@@ -1,4 +1,5 @@
 import Endpoint from '../structures/Endpoint';
+import ResponseError from '../structures/ResponseError';
 
 import paths from '../paths/search';
 
@@ -54,7 +55,8 @@ export default class Search extends Endpoint {
 
         try {
             const response = await endpoint({ query });
-            if (response.total_results === 0) return Promise.reject(Error('No results.'));
+            if (response.total_results === 0)
+                return Promise.reject(new ResponseError('No results.'));
 
             return response.results[0].id;
         } catch (error) {

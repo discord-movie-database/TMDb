@@ -1,3 +1,5 @@
+import ResponseError from './structures/ResponseError';
+
 import Find from './endpoints/Find';
 import Search from './endpoints/Search';
 
@@ -83,7 +85,7 @@ export default class V3 {
             return this.search._getIdFromQuery(method.query, type);
         }
 
-        return Promise.reject(Error('Method required.'));
+        return Promise.reject(new ResponseError('Method required.'));
     }
 
     /**
