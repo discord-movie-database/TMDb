@@ -1,345 +1,117 @@
-import Endpoint from '../structures/Endpoint';
+export const basePath = '/tv';
 
-import paths from '../paths/tv';
+export const endpoints = {
+    media: {
+        details: {
+            type: 1,
+            path: '/{id}',
+        },
 
-/**
- * TV endpoints.
- * @see https://developers.themoviedb.org/3/tv
- *
- * @prop {number} id TMDb ID
- * @extends {Endpoint}
- */
-export class TV extends Endpoint {
-    /**
-     * Creates an instance of TV.
-     *
-     * @param {number} version API version
-     * @param {Object} apiOptions API options
-     * @param {Object} wrapperOptions Wrapper options
-     * @param {number} id TMDb ID
-     */
-    constructor(version, apiOptions, wrapperOptions, id) {
-        super(version, apiOptions, wrapperOptions, paths);
+        alternative_titles: {
+            type: 0,
+            path: '/{id}/alternative_titles',
+        },
 
-        this.id = id;
-    }
+        changes: {
+            type: 0,
+            path: '/{id}/changes',
+        },
 
-    /**
-     * Gets the primary information about a TV show.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-details
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @param {string} [options.append_to_response] Request multiple endpoints at the same time (comma separated)
-     * @returns {Promise<Object>}
-     */
-    async getDetails(options) {
-        return this._request('GET', this._createPath(this._paths.details), options);
-    }
+        content_ratings: {
+            type: 0,
+            path: '/{id}/content_ratings',
+        },
 
-    /**
-     * TODO
-     *
-     * Gets all of the alternative titles for a TV show.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-alternative-titles
-     *
-     * @param {Object} [options] Request options
-     * @returns {Promise<Object>}
-     */
-    async getAlternativeTitles(options) {
-        return this._request('GET', this._createPath(this._paths.alternativeTitles), options);
-    }
+        credits: {
+            type: 0,
+            path: '/{id}/credits',
+        },
 
-    /**
-     * Gets the changes for a TV show.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-changes
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.start_date] Filter results by start date
-     * @param {string} [options.end_date] Filter results by end date
-     * @param {number} [options.page] Filter results by page
-     * @returns {Promise<Object>}
-     */
-    async getChanges(options) {
-        return this._request('GET', this._createPath(this._paths.changes), options);
-    }
+        episode_groups: {
+            type: 0,
+            path: '/{id}/episode_groups',
+        },
 
-    /**
-     * Gets the list of content ratings (certifications) that have been added to a TV show.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-content-ratings
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @returns {Promise<Object>}
-     */
-    async getContentRatings(options) {
-        return this._request('GET', this._createPath(this._paths.contentRatings), options);
-    }
+        external_ids: {
+            type: 0,
+            path: '/{id}/external_ids',
+        },
 
-    /**
-     * Gets the credits (cast and crew) for a TV show.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-credits
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @returns {Promise<Object>}
-     */
-    async getCredits(options) {
-        return this._request('GET', this._createPath(this._paths.credits), options);
-    }
+        images: {
+            type: 0,
+            path: '/{id}/images',
+        },
 
-    /**
-     * Gets all of the episode groups that have been created for a TV show.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-episode-groups
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @returns {Promise<Object>}
-     */
-    async getEpisodeGroups(options) {
-        return this._request('GET', this._createPath(this._paths.episodeGroups), options);
-    }
+        keywords: {
+            type: 0,
+            path: '/{id}keywords',
+        },
 
-    /**
-     * TODO
-     *
-     * Gets the external IDs for a TV show.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-external-ids
-     *
-     * Supported media databases: IMDb ID, TVDB ID, Freebase MID, Freebase ID, TVRange ID.
-     * Supported social IDs: Facebook, Instagram, Twitter.
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @returns {Promise<Object>}
-     */
-    async getExternalIds(options) {
-        return this._request('GET', this._createPath(this._paths.externalIds), options);
-    }
+        recommendations: {
+            type: 2,
+            path: '/{id}/recomendations',
+        },
 
-    /**
-     * TODO
-     *
-     * Gets the images that belong to a TV show.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-images
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @returns {Promise<Object>}
-     */
-    async getImages(options) {
-        return this._request('GET', this._createPath(this._paths.images), options);
-    }
+        reviews: {
+            type: 2,
+            path: '/{id}/reviews',
+        },
 
-    /**
-     * Gets the keywords that have been added to a TV show.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-keywords
-     *
-     * @param {Object} [options] Request options
-     * @returns {Promise<Object>}
-     */
-    async getKeywords(options) {
-        return this._request('GET', this._createPath(this._paths.keywords), options);
-    }
+        screened_theartically: {
+            type: 0,
+            path: '/{id}/screened_theartically',
+        },
 
-    /**
-     * Gets a list of recommended TV shows for a TV show.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-recommendations
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @param {number} [options.page] Filter results by page
-     * @returns {Promise<Object>}
-     */
-    async getRecommendations(options) {
-        return this._requestResults('GET', this._createPath(this._paths.recommendations), options);
-    }
+        similar: {
+            type: 2,
+            path: '/{id}/similar',
+        },
 
-    /**
-     * Gets the user reviews for a TV show.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-reviews
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @param {number} [options.page] Filter results by page
-     * @returns {Promise<Object>}
-     */
-    async getReviews(options) {
-        return this._requestResults('GET', this._createPath(this._paths.reviews), options);
-    }
+        translations: {
+            type: 0,
+            path: '/{id}/translations',
+        },
 
-    /**
-     * Gets a list of seasons or episodes that have been screened in a film festival or theatre.
-     * @see https://developers.themoviedb.org/3/tv/get-screened-theatrically
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @param {number} [options.page] Filter results by page
-     * @returns {Promise<Object>}
-     */
-    async getScreenedTheatrically(options) {
-        return this._request('GET', this._createPath(this._paths.screenedTheartically), options);
-    }
+        videos: {
+            type: 0,
+            path: '/{id}/videos',
+        },
 
-    /**
-     * Gets a list of similar TV shows.
-     * @see https://developers.themoviedb.org/3/tv/get-similar-tv-shows
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @param {number} [options.page] Filter results by page
-     * @returns {Promise<Object>}
-     */
-    async getSimilar(options) {
-        return this._requestResults('GET', this._createPath(this._paths.similar), options);
-    }
+        rating: {
+            type: 0,
+            path: '/{id}/rating',
+        },
 
-    /**
-     * Gets a list of translations that have been created for a TV show.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-translations
-     *
-     * @param {Object} [options] Request options
-     * @returns {Promise<Object>}
-     */
-    async getTranslations(options) {
-        return this._request('GET', this._createPath(this._paths.translations), options);
-    }
+        account_states: {
+            type: 0,
+            path: '/{id}/account_states',
+        },
+    },
 
-    /**
-     * Gets the videos that have been added to a TV show.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-videos
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @returns {Promise<Object>}
-     */
-    async getVideos(options) {
-        return this._request('GET', this._createPath(this._paths.translations), options);
-    }
+    more: {
+        latest: {
+            type: 0,
+            path: '/latest',
+        },
 
-    /**
-     * Gets TV related account states for a session.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-account-states
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.guest_session_id] Guest session ID
-     * @param {string} [options.session_id] Session ID
-     * @returns {Promise<Object>}
-     */
-    async getAccountStates(options) {
-        return this._request('GET', this._createPath(this._paths.accountStates), options);
-    }
+        airing_today: {
+            type: 2,
+            path: '/airing_today',
+        },
 
-    /**
-     * Rates a TV show.
-     * @see https://developers.themoviedb.org/3/tv/rate-tv-show
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.guest_session_id] Guest session ID
-     * @param {string} [options.session_id] Session ID
-     * @param {Object} [content] Request content
-     * @param {number} [content.value] Rating value between 0.5 and 10
-     * @returns {Promise<Object>}
-     */
-    async addRating(content, options) {
-        return this._request('POST', this._createPath(this._paths.rating), options, content);
-    }
+        on_the_air: {
+            type: 2,
+            path: '/on_the_air',
+        },
 
-    /**
-     * Removes a rating for a TV show.
-     * @see https://developers.themoviedb.org/3/tv/rate-tv-show
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.guest_session_id] Guest session ID
-     * @param {string} [options.session_id] Session ID
-     * @returns {Promise<Object>}
-     */
-    async removeRating(options) {
-        return this._request('DELETE', this._createPath(this._paths.rating), options);
-    }
-}
+        popular: {
+            type: 2,
+            path: '/popular',
+        },
 
-/**
- * TV endpoints.
- * @see https://developers.themoviedb.org/3/tv
- *
- * @extends {Endpoint}
- */
-export class TVMore extends Endpoint {
-    /**
-     * Creates an instance of TVMore.
-     *
-     * @param {number} version API version
-     * @param {Object} apiOptions API options
-     * @param {Object} wrapperOptions Wrapper options
-     */
-    constructor(version, apiOptions, wrapperOptions) {
-        super(version, apiOptions, wrapperOptions, paths);
-    }
-
-    /**
-     * Gets the most newly created TV show.
-     * @see https://developers.themoviedb.org/3/movies/get-latest-tv
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @returns {Promise<Object>}
-     */
-    async getLatest(options) {
-        return this._request('GET', this._createPath(this._paths.latest), options);
-    }
-
-    /**
-     * TODO
-     *
-     * Gets a list of TV shows that are airing today.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-airing-today
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @param {number} [options.page] Filter results by page
-     * @returns {Promise<Object>}
-     */
-    async getAiringToday(options) {
-        return this._requestResults('GET', this._createPath(this._paths.airingToday), options);
-    }
-
-    /**
-     * Gets a list of shows that are currently on the air.
-     * @see https://developers.themoviedb.org/3/tv/get-tv-airing-today
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @param {number} [options.page] Filter results by page
-     * @returns {Promise<Object>}
-     */
-    async getOnTheAir(options) {
-        return this._requestResults('GET', this._createPath(this._paths.onTheAir), options);
-    }
-
-    /**
-     * Gets a list of the current popular TV shows on TMDb.
-     * @see https://developers.themoviedb.org/3/tv/get-popular-tv-shows
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @param {number} [options.page] Filter results by page
-     * @returns {Promise<Object>}
-     */
-    async getPopular(options) {
-        return this._requestResults('GET', this._createPath(this._paths.popular), options);
-    }
-
-    /**
-     * Gets the top rated TV shows on TMDb.
-     * @see https://developers.themoviedb.org/3/tv/get-top-rated-tv
-     *
-     * @param {Object} [options] Request options
-     * @param {string} [options.language] ISO 639-1 value to get translated data
-     * @param {number} [options.page] Filter results by page
-     * @returns {Promise<Object>}
-     */
-    async getTopRated(options) {
-        return this._requestResults('GET', this._createPath(this._paths.topRated), options);
-    }
-}
+        top_rated: {
+            type: 2,
+            path: '/top_rated',
+        },
+    },
+};

@@ -1,11 +1,11 @@
 import ResponseError from './structures/ResponseError';
 
-import Find from './endpoints/Find';
-import Search from './endpoints/Search';
+import Find from './resources/Find';
+import Search from './resources/Search';
 
-import { Movie, MovieMore } from './endpoints/Movie';
-import { TV, TVMore } from './endpoints/TV';
-import { Person, PersonMore } from './endpoints/Person';
+import { Movie, MovieMore } from './resources/Movie';
+import { TV, TVMore } from './resources/TV';
+import { Person, PersonMore } from './resources/Person';
 
 /**
  * TMDb API version 3.
@@ -44,7 +44,7 @@ export default class V3 {
         };
 
         this.wrapperOptions = {
-            results_per_page: null,
+            results_per_page: 20,
             custom_id: false,
 
             ...wrapperOptions,

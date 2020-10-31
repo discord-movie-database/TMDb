@@ -25,5 +25,6 @@ module.exports = {
         'import/prefer-default-export': 'off',
         'import/no-unresolved': 'off',
         'no-useless-constructor': 'off',
+        'no-await-in-loop': 'off',
     },
 };
