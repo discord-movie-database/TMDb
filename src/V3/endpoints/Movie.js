@@ -8,12 +8,12 @@ export const endpoints = {
         },
 
         alternative_titles: {
-            type: 0, // 3
+            type: 0,
             path: '/{id}/alternative_titles',
         },
 
         changes: {
-            type: 0, // 3
+            type: 0,
             path: '/{id}/changes',
         },
 
@@ -35,27 +35,27 @@ export const endpoints = {
         },
 
         images: {
-            type: 0, // 3
+            type: 0,
             path: '/{id}/images',
         },
 
         keywords: {
-            type: 0, // 3
+            type: 0,
             path: '/{id}keywords',
         },
 
         release_dates: {
-            type: 0, // 3
+            type: 0,
             path: '/{id}/release_dates',
         },
 
         videos: {
-            type: 0, // 3
+            type: 0,
             path: '/{id}/videos',
         },
 
         translations: {
-            type: 0, // 3
+            type: 0,
             path: '/{id}/translations',
         },
 

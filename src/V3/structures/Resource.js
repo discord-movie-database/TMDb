@@ -7,28 +7,29 @@ import ResponseError from './ResponseError';
  *
  * @prop {string} _baseUrl API base URL
  * @prop {number} _version API version
- * @prop {Object} _apiOptions API request options
+ * @prop {Object} _apiOptions API options
  * @prop {Object} _wrapperOptions Wrapper options
  * @prop {string} _basePath Resource base path
  * @prop {Object} _endpoints Resource endpoints
- * @prop {Object} _pathParams Path parameters
- * @prop {number} _apiResultsPerPage API results per page
- * @prop {number} _apiPageLimit API page limit
+ * @prop {Object} _params Request path params
+ * @prop {Object} _api Default API values
+ * @prop {number} _api.results_per_page API results per page
+ * @prop {number} _api.page_limit API page limit
  */
 export default class Resource {
     /**
      * Creates an instance of Resource.
      *
      * @param {number} version API version
-     * @param {Object} apiOptions API request options
+     * @param {Object} apiOptions API options
      * @param {Object} wrapperOptions Wrapper options
      * @param {string} basePath Resource base path
      * @param {Object} endpoints Resource endpoints
-     * @param {Object} [pathParams] Path parameters
-     * @param {number} [pathParams.id] TMDb ID
-     * @param {string} [pathParams.externalId] External ID
+     * @param {Object} [params] Request path params
+     * @param {number} [params.id] TMDb ID
+     * @param {string} [params.externalId] External ID
      */
-    constructor(version, apiOptions, wrapperOptions, basePath, endpoints, pathParams = {}) {
+    constructor(version, apiOptions, wrapperOptions, basePath, endpoints, params = {}) {
         this._baseUrl = `https://api.themoviedb.org/`;
         this._version = version;
 
@@ -38,42 +39,45 @@ export default class Resource {
         this._basePath = basePath;
         this._endpoints = endpoints;
 
-        this._pathParams = pathParams;
+        this._params = params;
 
-        this._apiResultsPerPage = 20;
-        this._apiPageLimit = 500;
+        this._api = { page_limit: 500, results_per_page: 20 };
     }
 
     /**
-     * Formats the parameters in a path.
+     * Replaces endpoint path placeholders.
      *
      * @param {string} path Endpoint path
+     * @param {Object} params Endpoint path params
      * @returns {string}
      */
     _createPath(path, params = {}) {
         return (this._basePath + path)
-            .replace('{id}', params.id || this._pathParams.id)
-            .replace('{externalId}', params.externalId || this._pathParams.externalId);
+            .replace('{id}', params.id || this._params.id)
+            .replace('{externalId}', params.externalId || this._params.externalId);
     }
 
     /**
      * Sends a request to the TMDb API.
      *
+     * @param {string} method Request method
      * @param {string} path Endpoint path
-     * @param {axios} options Axios request options
+     * @param {Object} options Request options
+     * @param {Object} content Request content
+     * @param {Object} headers Request headers
      * @returns {Promise<Object>}
      */
-    async _request(method, path, options = {}, content = {}) {
+    async _request(method, path, options = {}, content = {}, headers = {}) {
+        if (!method) return Promise.reject(new ResponseError('Method required.'));
         if (!path) return Promise.reject(new ResponseError('Path required.'));
 
         try {
             const { data: response } = await axios({
                 method,
                 content,
-
                 url: this._baseUrl + this._version + path,
                 params: { ...this._apiOptions, ...options },
-                headers: { 'Content-Type': 'application/json;charset=utf-8', ...options.headers },
+                headers: { 'Content-Type': 'application/json;charset=utf-8', ...headers },
             });
 
             return response;
@@ -89,13 +93,13 @@ export default class Resource {
     }
 
     /**
-     * Mutates API request options.
+     * Mutates API options.
      *
-     * @param {Object} options API request options
+     * @param {Object} options API options
      * @returns {Object}
      */
-    _mutateResultsOptions(options) {
-        const offsetCount = this._apiResultsPerPage / this._wrapperOptions.results_per_page;
+    _mutateOptions(options = {}) {
+        const offsetCount = this._api.results_per_page / this._wrapperOptions.results_per_page;
 
         const inputPage = options.page || 1;
         const requestPage = Math.ceil(inputPage / offsetCount);
@@ -104,140 +108,160 @@ export default class Resource {
     }
 
     /**
-     * Mutates results response data.
+     * Mutates results data.
      *
      * @param {Object} data Response data
-     * @param {Object} options API request options
+     * @param {Object} options API options
      * @returns {Object}
      */
-    _mutateResultsResponse(data, options) {
-        const offsetCount = this._apiResultsPerPage / this._wrapperOptions.results_per_page;
+    _mutateResults(data, options = {}) {
+        const offsetCount = this._api.results_per_page / this._wrapperOptions.results_per_page;
+
+        if (offsetCount === 1) return data;
 
         const inputPage = options.page || 1;
         const requestPage = Math.ceil(inputPage / offsetCount);
 
+        const pageLimit = this._api.pageLimit * offsetCount;
+
+        if (inputPage < 1 || inputPage > pageLimit) {
+            return Promise.reject(new ResponseError('Page limit exceeded.'));
+        }
+
         const offsetNumber = (inputPage - 1) % offsetCount;
         const offsetPosition = offsetNumber * this._wrapperOptions.results_per_page;
 
-        if (inputPage < 1 || inputPage > this._wrapperOptions.results_per_page)
-            return Promise.reject(new ResponseError('Invalid page number.'));
+        for (let i = 0; i < data.results.length; i += 1) {
+            data.results[i].index = (requestPage - 1) * this._api.results_per_page + i + 1;
+        }
 
-        for (let i = 0; i < data.results.length; i += 1)
-            data.results[i].index = (requestPage - 1) * this._apiResultsPerPage + i + 1;
+        const totalPages = Math.ceil(data.total_results / this._wrapperOptions.results_per_page);
+        const results = data.results.splice(offsetPosition, this._wrapperOptions.results_per_page);
+
+        if (results.length === 0) return Promise.reject(Error('No results.'));
 
         return {
-            ...data,
+            results,
 
             page: inputPage,
-            total_pages: Math.ceil(data.total_results / this._wrapperOptions.results_per_page),
+            total_pages: totalPages,
             total_results: data.total_results,
-
-            results: data.results.splice(offsetPosition, this._wrapperOptions.results_per_page),
         };
     }
 
     /**
-     * Mutates list response data.
+     * Mutates list data.
      *
-     * @param {Array<Object>} list List
-     * @param {Object} options API request options
+     * @param {Array<Object>} list List results
+     * @param {Object} options API options
      * @returns {Object}
      */
-    _mutateListResponse(list, options = {}) {
+    _mutateList(list, options = {}) {
+        if (list.length === 0) return Promise.reject(Error('No results.'));
+
         const inputPage = options.page || 1;
-        const offsetCount = this._apiResultsPerPage / this._wrapperOptions.results_per_page;
+        const totalPages = Math.ceil(list.length / this._wrapperOptions.results_per_page);
 
-        const pages = [];
-
-        for (let i = 0; i < list.length; i += offsetCount) pages.push(list.slice(i, 5));
-
-        if (inputPage > pages.length)
+        if (inputPage < 1 || inputPage > totalPages) {
             return Promise.reject(new ResponseError('Invalid page number.'));
+        }
+
+        for (let i = 0; i < list.length; i += 1) list[i].index = i + 1;
+
+        const offsetPosition = (inputPage - 1) * this._wrapperOptions.results_per_page;
+        const results = list.slice(offsetPosition, this._wrapperOptions.results_per_page);
 
         return {
-            page: inputPage,
-            total_pages: pages.length,
-            total_results: list.length,
+            results,
 
-            results: pages[inputPage],
+            page: inputPage,
+            total_pages: totalPages,
+            total_results: list.length,
         };
     }
 
     /**
-     * Gets an endpoint with results and mutates the response.
+     * Gets an endpoint with results and mutate the data.
      *
      * @param {string} endpointName Endpoint name
-     * @param {Object} options API request options
+     * @param {Object} options API options
+     * @param {Object} params Request path params
      * @returns {Promise<Object>}
      */
-    async _getEndpointWithResults(endpointName, options = {}, params) {
+    async _getResults(endpointName, options = {}, params = {}) {
         const endpoint = this._endpoints[endpointName];
 
         try {
             const path = this._createPath(endpoint.path, params);
-            const requestOptions = this._mutateResultsOptions(options);
+            const mutatedOptions = this._mutateOptions(options);
 
-            const data = await this._request('GET', path, requestOptions);
+            const data = await this._request('GET', path, mutatedOptions);
 
-            return this._mutateResultsResponse(data, options);
+            return this._mutateResults(data, options);
         } catch (error) {
             return Promise.reject(error);
         }
     }
 
     /**
-     * Gets an endpoint and mutates a list of results.
+     * Gets an endpoint with a list and mutate the data.
      *
      * @param {string} endpointName Endpoint name
-     * @param {string} options API request options
-     * @param {Object} params API endpoint params
+     * @param {string} options API options
+     * @param {Object} params Request path params
      * @returns {Promise<Object>}
      */
-    async _getEndpointWithList(endpointName, options, params) {
+    async _getList(endpointName, options = {}, params = {}) {
         const endpoint = this._endpoints[endpointName];
 
         try {
             const path = this._createPath(endpoint.path, params);
             const data = await this._request('GET', path, options);
 
-            return endpoint.mutate(this._mutateListResponse.bind(this), data, options);
+            return endpoint.mutate(this._mutateList.bind(this), data, options);
         } catch (error) {
             return Promise.reject(Error(error));
         }
     }
 
     /**
-     * Gets an endpoint and mutate appended endpoints.
+     * Gets an endpoint with appends and mutate the data.
      *
      * @param {string} endpointName Endpoint name
      * @param {Object} options API request options
+     * @param {Object} params Request path params
      * @returns {Promise<Object>}
      */
-    async _getEndpointWithAppends(endpointName, options, params) {
+    async _getAppends(endpointName, options = {}, params = {}) {
         const endpoint = this._endpoints[endpointName];
 
-        if (!options.append_to_response)
+        if (!options.append_to_response) {
             return this._request('GET', this._createPath(endpoint.path, params), options);
+        }
 
         const endpointNames = options.append_to_response.split(',');
 
         try {
             const path = this._createPath(endpoint.path, params);
-            const requestOptions = options.page ? this._mutateResultsOptions(options) : options;
+            const mutatedOptions = options.page ? this._mutateOptions(options) : options;
 
-            const data = await this._request('GET', path, requestOptions);
+            const data = await this._request('GET', path, mutatedOptions);
 
             for (let i = 0; i < endpointNames.length; i += 1) {
                 const _endpointName = endpointNames[i];
                 const _endpoint = this._endpoints[_endpointName];
 
-                if (_endpoint && _endpoint.type === 2)
-                    data[_endpointName] = this._mutateResultsResponse(data[_endpointName], options);
+                if (_endpoint) {
+                    if (_endpoint.type === 2) {
+                        data[_endpointName] = this._mutateResults(data[_endpointName], options);
+                    }
 
-                if (_endpoint && _endpoint.type === 3) {
-                    const mutate = this._mutateListResponse.bind(this);
+                    if (_endpoint.type === 3 && this._wrapperOptions.always_use_results) {
+                        const mutate = this._mutateList.bind(this);
+                        const _data = data[_endpointName];
 
-                    data[_endpointName] = _endpoint.mutate(mutate, data[_endpointName], options);
+                        data[_endpointName] = _endpoint.mutate(mutate, _data, options);
+                    }
                 }
             }
 
@@ -248,30 +272,33 @@ export default class Resource {
     }
 
     /**
-     * Sends a request to an endpoint.
+     * Sends a request to the TMDb API.
      *
      * @param {string} endpointName Endpoint name
      * @param {Object} options API request options
+     * @param {Object} params Request path params
      * @returns {Promise<Object>}
      */
-    getEndpoint(endpointName, options, params) {
+    getEndpoint(endpointName, options = {}, params = {}) {
         const endpoint = this._endpoints[endpointName];
 
-        if (!endpoint) return Promise.reject(new ResponseError('Invalid endpoint name.'));
-
-        switch (endpoint.type) {
-            case 1:
-                return this._getEndpointWithAppends(endpointName, options, params);
-
-            case 2:
-                return this._getEndpointWithResults(endpointName, options, params);
-
-            case 3:
-                return this._getEndpointWithList(endpointName, options, params);
-
-            default:
-                return this._request('GET', this._createPath(endpoint.path, params), options);
+        if (!endpoint) {
+            return Promise.reject(new ResponseError('Invalid endpoint name.'));
         }
+
+        if (endpoint.type === 1) {
+            return this._getAppends(endpointName, options, params);
+        }
+
+        if (endpoint.type === 2 && this._wrapperOptions.results_per_page) {
+            return this._getResults(endpointName, options, params);
+        }
+
+        if (endpoint.type === 3 && this._wrapperOptions.always_use_results) {
+            return this._getList(endpointName, options, params);
+        }
+
+        return this._request('GET', this._createPath(endpoint.path, params), options);
     }
 
     /**
@@ -289,6 +316,8 @@ export default class Resource {
         if (!method) return Promise.reject(Error('Method required.'));
         if (!endpoint) return Promise.reject(Error('Invalid endpoint name.'));
 
-        return this._request(method, this._createPath(endpoint.path), options, content);
+        const path = this._createPath(endpoint.path);
+
+        return this._request(method, path, options, content);
     }
 }

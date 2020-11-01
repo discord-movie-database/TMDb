@@ -23,11 +23,17 @@ export default class V3 {
      * @param {string} [apiOptions.session_id] Session ID
      * @param {string} [apiOptions.guest_session_id] Guest session ID
      * @param {string} [apiOptions.include_image_language] Image language
-     * @param {string} [apiOptions.language] API language
-     * @param {string} [apiOptions.region] API region
+     * @param {string} [apiOptions.language] Language
+     * @param {string} [apiOptions.region] Region
      * @param {Object} [wrapperOptions] Wrapper options
      * @param {number} [wrapperOptions.results_per_page] Results per page
-     * @param {boolean} [wrapperOptions.custom_id] Use custom TMDb ID prefix for external ID method?
+     * @param {boolean} [wrapperOptions.always_use_results] Return simple lists as results structure
+     * @param {boolean} [wrapperOptions.custom_id] Use "t" as TMDb ID prefix for external ID method?
+     * @param {Find} find Find resource
+     * @param {Search} search Search resource
+     * @param {Movie} movie Movie resource
+     * @param {TV} tv TV resource
+     * @param {Person} person Person resource
      */
     constructor(apiOptions, wrapperOptions) {
         this.version = 3;
@@ -45,6 +51,7 @@ export default class V3 {
 
         this.wrapperOptions = {
             results_per_page: 20,
+            always_use_results: false,
             custom_id: false,
 
             ...wrapperOptions,

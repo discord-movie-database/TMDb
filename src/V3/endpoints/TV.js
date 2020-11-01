@@ -23,8 +23,15 @@ export const endpoints = {
         },
 
         credits: {
-            type: 0,
+            type: 3,
             path: '/{id}/credits',
+
+            mutate: (mutate, data, options) => ({
+                ...data,
+
+                cast: mutate(data.cast, options),
+                crew: mutate(data.crew, options),
+            }),
         },
 
         episode_groups: {

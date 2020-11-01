@@ -13,18 +13,39 @@ export const endpoints = {
         },
 
         movie_credits: {
-            type: 0,
+            type: 3,
             path: '/{id}/movie_credits',
+
+            mutate: (mutate, data, options) => ({
+                ...data,
+
+                cast: mutate(data.cast, options),
+                crew: mutate(data.crew, options),
+            }),
         },
 
         tv_credits: {
-            type: 0,
+            type: 3,
             path: '/{id}/tv_credits',
+
+            mutate: (mutate, data, options) => ({
+                ...data,
+
+                cast: mutate(data.cast, options),
+                crew: mutate(data.crew, options),
+            }),
         },
 
         combined_credits: {
-            type: 0,
+            type: 3,
             path: '/{id}/combined_credits',
+
+            mutate: (mutate, data, options) => ({
+                ...data,
+
+                cast: mutate(data.cast, options),
+                crew: mutate(data.crew, options),
+            }),
         },
 
         external_ids: {
