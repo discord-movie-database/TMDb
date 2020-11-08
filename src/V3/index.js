@@ -71,13 +71,11 @@ export default class V3 {
      * Gets the TMDb ID using a method.
      *
      * @param {Object} method Method
-     * @param {number} [method.id] TMDb ID
-     * @param {string} [method.externalId] External ID
-     * @param {string} [method.query] Query
      * @param {string} type Media type
+     * @param {Object} options API options
      * @returns {Promise<number>}
      */
-    async _getIdFromMethod(method, type) {
+    async _getIdFromMethod(method, type, options) {
         if (method.id) return method.id;
 
         try {
@@ -89,7 +87,7 @@ export default class V3 {
         }
 
         if (method.query) {
-            return this.search._getIdFromQuery(method.query, type);
+            return this.search._getIdFromQuery(method.query, type, options);
         }
 
         return Promise.reject(new ResponseError('Method required.'));
@@ -112,11 +110,12 @@ export default class V3 {
      * @param {number} [method.id] TMDb ID
      * @param {string} [method.externalId] External ID
      * @param {string} [method.query] Query
+     * @param {Object} [options] API options
      * @returns {Promise<Movie>}
      */
-    async getMovieFromMethod(method) {
+    async getMovieFromMethod(method, options) {
         try {
-            const id = await this._getIdFromMethod(method, 'movie_results');
+            const id = await this._getIdFromMethod(method, 'movie_results', options);
 
             return this.getMovie(id);
         } catch (error) {
@@ -141,11 +140,12 @@ export default class V3 {
      * @param {number} [method.id] TMDb ID
      * @param {string} [method.externalId] External ID
      * @param {string} [method.query] Query
+     * @param {Object} [options] API options
      * @returns {Promise<TV>}
      */
-    async getTVShowFromMethod(method) {
+    async getTVShowFromMethod(method, options) {
         try {
-            const id = await this._getIdFromMethod(method, 'tv_results');
+            const id = await this._getIdFromMethod(method, 'tv_results', options);
 
             return this.getTVShow(id);
         } catch (error) {
@@ -170,11 +170,12 @@ export default class V3 {
      * @param {number} [method.id] TMDb ID
      * @param {string} [method.externalId] External ID
      * @param {string} [method.query] Query
+     * @param {Object} [options] API options
      * @returns {Promise<Person>}
      */
-    async getPersonFromMethod(method) {
+    async getPersonFromMethod(method, options) {
         try {
-            const id = await this._getIdFromMethod(method, 'person_results');
+            const id = await this._getIdFromMethod(method, 'person_results', options);
 
             return this.getPerson(id);
         } catch (error) {

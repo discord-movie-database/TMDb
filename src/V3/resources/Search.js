@@ -48,13 +48,14 @@ export default class Search extends Resource {
      *
      * @param {string} query Query
      * @param {string} type Media type
+     * @param {Object} options API options
      * @returns {Promise<number>}
      */
-    async _getIdFromQuery(query, type) {
+    async _getIdFromQuery(query, type, options) {
         const resource = this._getResourceFromType(type);
 
         try {
-            const response = await resource({ query });
+            const response = await resource({ ...options, query });
             if (response.total_results === 0)
                 return Promise.reject(new ResponseError('No results.'));
 
