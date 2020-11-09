@@ -256,7 +256,7 @@ export class MovieMore extends Resource {
      * @param {Object} wrapperOptions Wrapper options
      */
     constructor(version, apiOptions, wrapperOptions) {
-        super(version, apiOptions, wrapperOptions, endpoints.more);
+        super(version, apiOptions, wrapperOptions, basePath, endpoints.more);
     }
 
     /**
