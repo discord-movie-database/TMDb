@@ -50,8 +50,14 @@ export const endpoints = {
         },
 
         videos: {
-            type: 0,
+            type: 3,
             path: '/{id}/videos',
+
+            mutate: (mutate, data, options) => ({
+                ...data,
+
+                results: mutate(data.results, options),
+            }),
         },
 
         translations: {
