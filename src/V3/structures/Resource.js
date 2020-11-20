@@ -119,7 +119,7 @@ export default class Resource {
 
         if (offsetCount === 1) return data;
 
-        const inputPage = options.page || 1;
+        const inputPage = parseInt(options.page, 10) && options.page >= 1 ? options.page : 1;
         const requestPage = Math.ceil(inputPage / offsetCount);
 
         const pageLimit = this._api.pageLimit * offsetCount;
